@@ -1,12 +1,27 @@
 {
-  "name": "bodycam-overlay",
-  "version": "1.0.0",
-  "description": "Bodycam overlay for BRM5",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "dependencies": {
-    "electron": "^41.0.0"
-  }
+   "name": "bodycam-overlay",
+   "version": "1.0.0",
+   "description": "Bodycam overlay for BRM5",
+   "main": "main.js",
+   "scripts": {
+      "start": "electron .",
+      "build": "electron-builder"
+   },
+   "build": {
+      "appId": "com.bodycam.experience",
+      "productName": "Bodycam_EXPER1ENCE",
+      "win": {
+         "target": "portable"
+      },
+      "files": [
+         "main.js",
+         "bodycam-overlay.html"
+      ],
+      "extraResources": [],
+      "asar": true
+   },
+   "devDependencies": {
+      "electron": "^41.0.0",
+      "electron-builder": "^24.0.0"
+   }
 }

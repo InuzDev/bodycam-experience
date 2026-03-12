@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BODYCAM Overlay – BRM5</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: transparent !important;
+    background-color: transparent !important;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ── VIGNETTE ── heavy */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center,
+      transparent 25%,
+      rgba(0,0,0,0.6) 60%,
+      rgba(0,0,0,0.95) 100%
+    );
+    z-index: 10;
+  }
+
+  /* ── FILM GRAIN ── heavy */
+  .grain {
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: 11;
+    opacity: 0.22;
+    animation: grainShift 0.05s steps(1) infinite;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  @keyframes grainShift {
+    0%  { transform: translate(0,0) scale(1.05); }
+    10% { transform: translate(-4%,-4%) scale(1.0); }
+    20% { transform: translate(5%, 3%) scale(1.08); }
+    30% { transform: translate(-3%, 6%) scale(1.02); }
+    40% { transform: translate(4%,-5%) scale(1.06); }
+    50% { transform: translate(-6%, 3%) scale(1.0); }
+    60% { transform: translate(3%, 4%) scale(1.04); }
+    70% { transform: translate(-4%,-6%) scale(1.07); }
+    80% { transform: translate(6%, 2%) scale(1.01); }
+    90% { transform: translate(-2%,-4%) scale(1.05); }
+    100%{ transform: translate(3%, 5%) scale(1.03); }
+  }
+
+  /* ── CHROMATIC ABERRATION ── strong */
+  .chroma {
+    position: fixed;
+    inset: 0;
+    z-index: 12;
+    opacity: 0.12;
+    background: linear-gradient(
+      90deg,
+      rgba(255,0,0,0.6) 0%,
+      transparent 12%,
+      transparent 88%,
+      rgba(0,100,255,0.6) 100%
+    );
+    animation: chromaPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes chromaPulse {
+    0%, 100% { opacity: 0.10; }
+    50% { opacity: 0.18; }
+  }
+
+  /* ── SCAN LINES ── more visible */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 13;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.10) 3px,
+      rgba(0,0,0,0.10) 4px
+    );
+  }
+
+  /* ── LENS DISTORTION ── */
+  .lens {
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    box-shadow: inset 0 0 120px 40px rgba(0,0,0,0.5);
+  }
+
+  /* ── CAMERA SHAKE ── more aggressive */
+  .shake-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    animation: camShake 0.1s ease-in-out infinite;
+  }
+
+  @keyframes camShake {
+    0%   { transform: translate(0px, 0px) rotate(0deg); }
+    15%  { transform: translate(-1.2px, 0.8px) rotate(0.12deg); }
+    30%  { transform: translate(1.5px, -1.1px) rotate(-0.10deg); }
+    45%  { transform: translate(-0.9px, 1.4px) rotate(0.14deg); }
+    60%  { transform: translate(1.3px, -0.7px) rotate(-0.11deg); }
+    75%  { transform: translate(-1.4px, 0.9px) rotate(0.09deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
+  }
+
+  /* ── FOCUS BLUR edges ── */
+  .focus-blur {
+    position: fixed;
+    inset: 0;
+    z-index: 14;
+    background: radial-gradient(ellipse 70% 65% at 50% 50%, transparent 55%, rgba(0,0,0,0.20) 100%);
+  }
+
+  /* ── EXPOSURE FLICKER ── more frequent */
+  .flicker {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    background: rgba(255,255,255,0);
+    animation: exposureFlicker 5s ease-in-out infinite;
+  }
+
+  @keyframes exposureFlicker {
+    0%,100% { opacity: 0; background: rgba(255,255,255,0); }
+    3%  { opacity: 1; background: rgba(255,255,255,0.03); }
+    6%  { opacity: 0; }
+    30% { opacity: 0; background: rgba(0,0,0,0); }
+    32% { opacity: 1; background: rgba(0,0,0,0.08); }
+    34% { opacity: 0; }
+    60% { opacity: 0; }
+    61% { opacity: 1; background: rgba(255,255,255,0.04); }
+    62% { opacity: 0; }
+  }
+
+  /* ── COMPRESSION ARTIFACT blocks ── */
+  .artifact {
+    position: fixed;
+    z-index: 19;
+    pointer-events: none;
+    opacity: 0;
+    animation: artifactPop 7s ease infinite;
+  }
+
+  .artifact:nth-child(1) { top: 20%; left: 10%; width: 60px; height: 8px; background: rgba(0,255,180,0.15); animation-delay: 0s; }
+  .artifact:nth-child(2) { top: 55%; left: 80%; width: 40px; height: 6px; background: rgba(255,50,50,0.12); animation-delay: 2.3s; }
+  .artifact:nth-child(3) { top: 75%; left: 30%; width: 80px; height: 4px; background: rgba(100,100,255,0.10); animation-delay: 4.1s; }
+
+  @keyframes artifactPop {
+    0%,100% { opacity: 0; }
+    85% { opacity: 0; }
+    87% { opacity: 1; transform: translateX(4px); }
+    89% { opacity: 0; transform: translateX(-2px); }
+    91% { opacity: 1; }
+    93% { opacity: 0; }
+  }
+
+  /* ── GLITCH ── stronger */
+  .glitch {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(
+      transparent 28%,
+      rgba(0,255,200,0.07) 29%,
+      rgba(0,255,200,0.07) 31%,
+      transparent 32%,
+      transparent 58%,
+      rgba(255,0,100,0.05) 59%,
+      rgba(255,0,100,0.05) 61%,
+      transparent 62%
+    );
+  }
+
+  /* ── ROLLING SHUTTER line ── */
+  .rolling {
+    position: fixed;
+    left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    z-index: 18;
+    opacity: 0;
+    animation: rollingShutter 6s linear infinite;
+  }
+
+  @keyframes rollingShutter {
+    0%   { top: -5px; opacity: 0; }
+    5%   { opacity: 1; }
+    95%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* ── HUD: RECORDING ── */
+  .hud {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rec-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #ff1111;
+    box-shadow: 0 0 12px #ff0000, 0 0 4px #ff0000;
+    animation: recBlink 1.2s ease-in-out infinite;
+  }
+
+  @keyframes recBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.05; }
+  }
+
+  .rec-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #ff2222;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(255,0,0,0.8);
+  }
+
+  .timecode {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 2px;
+    text-shadow: 0 1px 4px rgba(0,0,0,1);
+  }
+
+  .cam-info {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    z-index: 100;
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 1px;
+    line-height: 1.7;
+    text-shadow: 0 1px 4px rgba(0,0,0,1);
+  }
+
+  .battery {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 1px;
+    text-shadow: 0 1px 4px rgba(0,0,0,1);
+  }
+
+  .battery-icon {
+    width: 22px; height: 11px;
+    border: 1.5px solid rgba(255,255,255,0.5);
+    border-radius: 2px;
+    position: relative;
+  }
+  .battery-icon::after {
+    content: '';
+    position: absolute;
+    right: -4px; top: 50%;
+    transform: translateY(-50%);
+    width: 2px; height: 5px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 0 1px 1px 0;
+  }
+  .battery-fill {
+    position: absolute;
+    left: 1px; top: 1px; bottom: 1px;
+    width: 72%;
+    background: rgba(100,255,100,0.8);
+    border-radius: 1px;
+  }
+
+  /* ── HOTKEYS HINT ── */
+  .hotkeys {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    font-size: 9px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 1.5px;
+    text-shadow: 0 1px 3px rgba(0,0,0,1);
+    text-align: center;
+  }
+
+  /* ── NIGHT VISION ── */
+  body.nightvision .vignette {
+    background: radial-gradient(ellipse at center,
+      transparent 20%,
+      rgba(0,40,0,0.65) 65%,
+      rgba(0,10,0,0.95) 100%
+    );
+  }
+  body.nightvision .grain {
+    opacity: 0.28;
+    filter: hue-rotate(110deg) saturate(3);
+  }
+  body.nightvision .chroma {
+    filter: hue-rotate(110deg);
+  }
+  body.nightvision::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 120, 0, 0.18);
+    mix-blend-mode: color;
+    z-index: 16;
+    pointer-events: none;
+  }
+
+  /* ── STARTUP ── */
+  .startup {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    animation: startupFade 2.8s ease forwards;
+    animation-delay: 0.3s;
+    opacity: 1;
+    pointer-events: none;
+  }
+
+  @keyframes startupFade {
+    0%,70% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+  }
+
+  .startup-logo {
+    font-size: 26px;
+    color: white;
+    letter-spacing: 8px;
+    font-weight: bold;
+    animation: logoBlink 0.3s steps(1) 4;
+  }
+  @keyframes logoBlink {
+    0%,100%{opacity:1}50%{opacity:0}
+  }
+  .startup-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 5px;
+  }
+</style>
+</head>
+<body>
+
+<!-- STARTUP -->
+<div class="startup">
+  <div class="startup-logo">● REC</div>
+  <div class="startup-text">MOC. DATA-SPEC-OPS, BL4CK_WAT3R</div>
+  <div class="startup-text" style="font-size:10px;margin-top:2px;color:rgba(255,255,255,0.25)">INITIALIZING SYSTEM...</div>
+</div>
+
+<!-- LAYERS -->
+<div class="shake-wrapper"><div class="lens"></div></div>
+<div class="vignette"></div>
+<div class="grain"></div>
+<div class="chroma"></div>
+<div class="scanlines"></div>
+<div class="focus-blur"></div>
+<div class="flicker"></div>
+<div class="rolling"></div>
+<div class="glitch"></div>
+<div class="artifact"></div>
+<div class="artifact"></div>
+<div class="artifact"></div>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="rec-dot"></div>
+  <div class="rec-label">REC</div>
+</div>
+<div class="timecode" id="timecode">00:00:00</div>
+<div class="cam-info">BL4CK_WAT3R BODYCAM<br>1080p · 60FPS · UNIT ; BW 19</div>
+<div class="battery">
+  <div class="battery-icon"><div class="battery-fill"></div></div>
+  <span>83%</span>
+</div>
+<div class="hotkeys">Ctrl+H HIDE &nbsp;·&nbsp; Ctrl+N NIGHT VIS &nbsp;·&nbsp; Ctrl+Q QUIT</div>
+
+<script>
+  // timecode
+  let startTime = Date.now();
+  setInterval(() => {
+    const e = Math.floor((Date.now()-startTime)/1000);
+    const h = String(Math.floor(e/3600)).padStart(2,'0');
+    const m = String(Math.floor((e%3600)/60)).padStart(2,'0');
+    const s = String(e%60).padStart(2,'0');
+    document.getElementById('timecode').textContent = `${h}:${m}:${s}`;
+  }, 1000);
+
+  // random heavy glitch bursts
+  setInterval(() => {
+    if (Math.random() < 0.12) {
+      const g = document.querySelector('.glitch');
+      const frames = 4 + Math.floor(Math.random()*4);
+      let i = 0;
+      const interval = setInterval(() => {
+        g.style.opacity = i%2===0 ? '1' : '0';
+        g.style.transform = `translateX(${(Math.random()-0.5)*14}px)`;
+        i++;
+        if (i >= frames) {
+          clearInterval(interval);
+          g.style.opacity = '0';
+          g.style.transform = '';
+        }
+      }, 60);
+    }
+  }, 600);
+
+  // hide startup
+  setTimeout(() => {
+    const s = document.querySelector('.startup');
+    if (s) s.style.display = 'none';
+  }, 3300);
+</script>
+</body>
+</html>

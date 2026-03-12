@@ -1,5 +1,5 @@
-const { app, BrowserWindow, globalShortcut } = require('electron')
-const path = require('path')
+const { app, BrowserWindow, globalShortcut } = require("electron");
+const path = require("path");
 
 app.whenReady().then(() => {
    const win = new BrowserWindow({
@@ -15,34 +15,54 @@ app.whenReady().then(() => {
       focusable: false,
       webPreferences: {
          nodeIntegration: false,
+         contextIsolation: false,
+      },
+   });
+
+   win.loadURL("file://" + path.join(__dirname, "bodycam-overlay.html"));
+   win.setIgnoreMouseEvents(true);
+   win.setAlwaysOnTop(true, "screen-saver");
+
+   // Ctrl+Q - quit
+   globalShortcut.register("Control+Q", () => {
+      app.quit();
+   });
+
+   // Ctrl+H - hide/show overlay + re-initialization animation
+   let visible = true;
+   globalShortcut.register("Control+H", () => {
+      visible = !visible;
+      if (visible) {
+         win.showInactive();
+         win.webContents.executeJavaScript(`triggerStartup()`);
+      } else {
+         win.hide();
       }
-   })
+   });
 
-   win.loadURL('file://' + path.join(__dirname, 'bodycam-overlay.html'))
-   win.setIgnoreMouseEvents(true)
-   win.setAlwaysOnTop(true, 'screen-saver')
+   // Ctrl+N - toggle night vision
+   globalShortcut.register("Control+N", () => {
+      win.webContents.executeJavaScript(
+         `document.body.classList.toggle('nightvision')`,
+      );
+   });
 
-   // Ctrl+Q → quit
-   globalShortcut.register('Control+Q', () => {
-      app.quit()
-   })
+   // Ctrl+, - open/close settings
+   globalShortcut.register("Control+,", () => {
+      win.webContents.executeJavaScript(`toggleSettings()`).then((isOpen) => {
+         if (isOpen) {
+            // settings opened — make window interactive
+            win.setFocusable(true);
+            win.focus();
+            win.setIgnoreMouseEvents(false);
+         } else {
+            // settings closed — back to click-through
+            win.setIgnoreMouseEvents(true);
+            win.setFocusable(false);
+         }
+      });
+   });
+});
 
-   // Ctrl+H → hide/show overlay
-   let visible = true
-   globalShortcut.register('Control+H', () => {
-      visible = !visible
-      if (visible) win.showInactive()
-      else win.hide()
-   })
-
-   // Ctrl+N → toggle night vision (sends message to HTML)
-   globalShortcut.register('Control+N', () => {
-      win.webContents.executeJavaScript(`
-      document.body.classList.toggle('nightvision');
-    `)
-   })
-})
-
-app.on('will-quit', () => globalShortcut.unregisterAll())
-app.on('window-all-closed', () => app.quit())
-
+app.on("will-quit", () => globalShortcut.unregisterAll());
+app.on("window-all-closed", () => app.quit());

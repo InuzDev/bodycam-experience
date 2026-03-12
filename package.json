@@ -1,7 +1,7 @@
 {
    "name": "bodycam-overlay",
-   "version": "1.0.0",
-   "description": "Bodycam overlay for BRM5",
+   "version": "1.1.0",
+   "description": "A bodycam filter effect",
    "main": "main.js",
    "scripts": {
       "start": "electron .",

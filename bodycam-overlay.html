@@ -23,7 +23,7 @@
             user-select: none;
          }
 
-         /* ── VIGNETTE ── heavy */
+         /* ── VIGNETTE ── */
          .vignette {
             position: fixed;
             inset: 0;
@@ -36,7 +36,7 @@
             z-index: 10;
          }
 
-         /* ── FILM GRAIN ── heavy */
+         /* ── FILM GRAIN ── */
          .grain {
             position: fixed;
             inset: -50%;
@@ -85,7 +85,7 @@
             }
          }
 
-         /* ── CHROMATIC ABERRATION ── strong */
+         /* ── CHROMATIC ABERRATION ── */
          .chroma {
             position: fixed;
             inset: 0;
@@ -111,7 +111,7 @@
             }
          }
 
-         /* ── SCAN LINES ── more visible */
+         /* ── SCAN LINES ── */
          .scanlines {
             position: fixed;
             inset: 0;
@@ -125,7 +125,7 @@
             );
          }
 
-         /* ── LENS DISTORTION ── */
+         /* ── LENS ── */
          .lens {
             position: fixed;
             inset: 0;
@@ -133,7 +133,7 @@
             box-shadow: inset 0 0 120px 40px rgba(0, 0, 0, 0.5);
          }
 
-         /* ── CAMERA SHAKE ── more aggressive */
+         /* ── CAMERA SHAKE ── */
          .shake-wrapper {
             position: fixed;
             inset: 0;
@@ -165,7 +165,7 @@
             }
          }
 
-         /* ── FOCUS BLUR edges ── */
+         /* ── FOCUS BLUR ── */
          .focus-blur {
             position: fixed;
             inset: 0;
@@ -177,7 +177,7 @@
             );
          }
 
-         /* ── EXPOSURE FLICKER ── more frequent */
+         /* ── FLICKER ── */
          .flicker {
             position: fixed;
             inset: 0;
@@ -222,7 +222,7 @@
             }
          }
 
-         /* ── COMPRESSION ARTIFACT blocks ── */
+         /* ── COMPRESSION ARTIFACTS ── */
          .artifact {
             position: fixed;
             z-index: 19;
@@ -230,7 +230,6 @@
             opacity: 0;
             animation: artifactPop 7s ease infinite;
          }
-
          .artifact:nth-child(1) {
             top: 20%;
             left: 10%;
@@ -280,7 +279,7 @@
             }
          }
 
-         /* ── GLITCH ── stronger */
+         /* ── GLITCH ── */
          .glitch {
             position: fixed;
             inset: 0;
@@ -299,7 +298,7 @@
             );
          }
 
-         /* ── ROLLING SHUTTER line ── */
+         /* ── ROLLING SHUTTER ── */
          .rolling {
             position: fixed;
             left: 0;
@@ -328,7 +327,7 @@
             }
          }
 
-         /* ── HUD: RECORDING ── */
+         /* ── HUD ── */
          .hud {
             position: fixed;
             top: 16px;
@@ -433,7 +432,6 @@
             border-radius: 1px;
          }
 
-         /* ── HOTKEYS HINT ── */
          .hotkeys {
             position: fixed;
             bottom: 16px;
@@ -445,6 +443,7 @@
             letter-spacing: 1.5px;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 1);
             text-align: center;
+            white-space: nowrap;
          }
 
          /* ── NIGHT VISION ── */
@@ -484,10 +483,16 @@
             align-items: center;
             justify-content: center;
             gap: 14px;
-            animation: startupFade 2.8s ease forwards;
-            animation-delay: 0.3s;
-            opacity: 1;
             pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: none;
+         }
+
+         .startup.active {
+            opacity: 1;
+            visibility: visible;
+            animation: startupFade 2.8s ease forwards;
          }
 
          @keyframes startupFade {
@@ -522,14 +527,171 @@
             color: rgba(255, 255, 255, 0.5);
             letter-spacing: 5px;
          }
+
+         /* ── SETTINGS PANEL ── */
+         .settings {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            z-index: 500;
+            background: rgba(0, 0, 0, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            padding: 28px 32px;
+            width: 380px;
+            pointer-events: auto;
+            display: none;
+            opacity: 0;
+            transition:
+               opacity 0.2s ease,
+               transform 0.2s ease;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+         }
+
+         .settings.open {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+         }
+
+         .settings h2 {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 4px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+         }
+
+         .settings-section {
+            margin-bottom: 20px;
+         }
+
+         .settings-section h3 {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+         }
+
+         .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+         }
+
+         .slider-row label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 1px;
+            width: 80px;
+            flex-shrink: 0;
+         }
+
+         .slider-row input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+         }
+
+         .slider-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff3333;
+            box-shadow: 0 0 6px rgba(255, 0, 0, 0.5);
+            cursor: pointer;
+         }
+
+         .slider-row .val {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            width: 28px;
+            text-align: right;
+         }
+
+         .input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+         }
+
+         .input-row label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 1px;
+            width: 80px;
+            flex-shrink: 0;
+         }
+
+         .input-row input[type="text"] {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 3px;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            padding: 6px 10px;
+            outline: none;
+            letter-spacing: 1px;
+            transition: border-color 0.15s;
+         }
+
+         .input-row input[type="text"]:focus {
+            border-color: rgba(255, 50, 50, 0.5);
+         }
+
+         .settings-close {
+            margin-top: 20px;
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 40, 40, 0.15);
+            border: 1px solid rgba(255, 40, 40, 0.3);
+            border-radius: 3px;
+            color: rgba(255, 100, 100, 0.9);
+            font-family: "Courier New", monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.15s;
+            pointer-events: auto;
+         }
+
+         .settings-close:hover {
+            background: rgba(255, 40, 40, 0.25);
+            border-color: rgba(255, 40, 40, 0.6);
+         }
+
+         /* dim overlay when settings open */
+         .settings-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 499;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            pointer-events: auto;
+         }
+         .settings-backdrop.open {
+            display: block;
+         }
       </style>
    </head>
    <body>
       <!-- STARTUP -->
-      <div class="startup">
+      <div class="startup active" id="startup">
          <div class="startup-logo">● REC</div>
-         <!--You can change this to customize it for the better, incoming update to make this more dynamic.-->
-         <div class="startup-text">Mocaccino ; RecTec</div>
+         <div class="startup-text" id="startup-camname">AXON BODY CAM 3</div>
          <div
             class="startup-text"
             style="
@@ -562,19 +724,122 @@
          <div class="rec-label">REC</div>
       </div>
       <div class="timecode" id="timecode">00:00:00</div>
-      <div class="cam-info">
-         BL4CK_WAT3R BODYCAM<br />1080p · 60FPS · UNIT ; BW 19
+      <div class="cam-info" id="cam-info">
+         AXON BODY CAM 3<br />1080p · 60FPS · UNIT #BRM-07
       </div>
       <div class="battery">
          <div class="battery-icon"><div class="battery-fill"></div></div>
-         <span>83%</span>
+         <span>74%</span>
       </div>
       <div class="hotkeys">
-         Ctrl+H HIDE &nbsp;·&nbsp; Ctrl+N NIGHT VIS &nbsp;·&nbsp; Ctrl+Q QUIT
+         Ctrl+H HIDE &nbsp;·&nbsp; Ctrl+N NIGHT VIS &nbsp;·&nbsp; Ctrl+,
+         SETTINGS &nbsp;·&nbsp; Ctrl+Q QUIT
+      </div>
+
+      <!-- SETTINGS -->
+      <div
+         class="settings-backdrop"
+         id="backdrop"
+         onclick="closeSettings()"
+      ></div>
+      <div class="settings" id="settings">
+         <h2>⚙ BODYCAM SETTINGS</h2>
+
+         <div class="settings-section">
+            <h3>Identity</h3>
+            <div class="input-row">
+               <label>CAM NAME</label>
+               <input
+                  type="text"
+                  id="input-camname"
+                  value="AXON BODY CAM 3"
+                  maxlength="24"
+                  oninput="updateCamName()"
+               />
+            </div>
+            <div class="input-row">
+               <label>UNIT #</label>
+               <input
+                  type="text"
+                  id="input-unit"
+                  value="BRM-07"
+                  maxlength="12"
+                  oninput="updateCamName()"
+               />
+            </div>
+         </div>
+
+         <div class="settings-section">
+            <h3>Effect Intensity</h3>
+            <div class="slider-row">
+               <label>GRAIN</label>
+               <input
+                  type="range"
+                  id="sl-grain"
+                  min="0"
+                  max="100"
+                  value="45"
+                  oninput="applySettings()"
+               />
+               <span class="val" id="v-grain">45</span>
+            </div>
+            <div class="slider-row">
+               <label>SHAKE</label>
+               <input
+                  type="range"
+                  id="sl-shake"
+                  min="0"
+                  max="100"
+                  value="50"
+                  oninput="applySettings()"
+               />
+               <span class="val" id="v-shake">50</span>
+            </div>
+            <div class="slider-row">
+               <label>VIGNETTE</label>
+               <input
+                  type="range"
+                  id="sl-vignette"
+                  min="0"
+                  max="100"
+                  value="60"
+                  oninput="applySettings()"
+               />
+               <span class="val" id="v-vignette">60</span>
+            </div>
+            <div class="slider-row">
+               <label>CHROMA</label>
+               <input
+                  type="range"
+                  id="sl-chroma"
+                  min="0"
+                  max="100"
+                  value="50"
+                  oninput="applySettings()"
+               />
+               <span class="val" id="v-chroma">50</span>
+            </div>
+            <div class="slider-row">
+               <label>GLITCH</label>
+               <input
+                  type="range"
+                  id="sl-glitch"
+                  min="0"
+                  max="100"
+                  value="50"
+                  oninput="applySettings()"
+               />
+               <span class="val" id="v-glitch">50</span>
+            </div>
+         </div>
+
+         <button class="settings-close" onclick="closeSettings()">
+            CLOSE &nbsp;[Ctrl+,]
+         </button>
       </div>
 
       <script>
-         // timecode
+         // ── TIMECODE ──
          let startTime = Date.now();
          setInterval(() => {
             const e = Math.floor((Date.now() - startTime) / 1000);
@@ -584,18 +849,117 @@
             document.getElementById("timecode").textContent = `${h}:${m}:${s}`;
          }, 1000);
 
-         // random heavy glitch bursts
+         // ── STARTUP ──
+         function triggerStartup() {
+            const s = document.getElementById("startup");
+            s.classList.remove("active");
+            void s.offsetWidth; // force reflow to restart animation
+            s.style.display = "flex";
+            s.classList.add("active");
+            setTimeout(() => {
+               s.style.display = "none";
+            }, 3300);
+         }
+
+         // hide initial startup after load
+         setTimeout(() => {
+            document.getElementById("startup").style.display = "none";
+         }, 3300);
+
+         // ── SETTINGS ──
+         let settingsOpen = false;
+
+         function toggleSettings() {
+            settingsOpen = !settingsOpen;
+            document
+               .getElementById("settings")
+               .classList.toggle("open", settingsOpen);
+            document
+               .getElementById("backdrop")
+               .classList.toggle("open", settingsOpen);
+            return settingsOpen;
+         }
+
+         function closeSettings() {
+            settingsOpen = false;
+            document.getElementById("settings").classList.remove("open");
+            document.getElementById("backdrop").classList.remove("open");
+            // tell main.js to go back to click-through
+            if (window.electronAPI) window.electronAPI.settingsClosed();
+         }
+
+         // ── APPLY SETTINGS ──
+         function applySettings() {
+            const grain = document.getElementById("sl-grain").value;
+            const shake = document.getElementById("sl-shake").value;
+            const vignette = document.getElementById("sl-vignette").value;
+            const chroma = document.getElementById("sl-chroma").value;
+            const glitch = document.getElementById("sl-glitch").value;
+
+            document.getElementById("v-grain").textContent = grain;
+            document.getElementById("v-shake").textContent = shake;
+            document.getElementById("v-vignette").textContent = vignette;
+            document.getElementById("v-chroma").textContent = chroma;
+            document.getElementById("v-glitch").textContent = glitch;
+
+            // grain opacity: 0–0.40
+            document.querySelector(".grain").style.opacity = (
+               (grain / 100) *
+               0.4
+            ).toFixed(3);
+
+            // shake: scale animation duration (faster = more shake)
+            const shakeDur = 0.22 - (shake / 100) * 0.18; // 0.22s (min) to 0.04s (max)
+            document.querySelector(".shake-wrapper").style.animationDuration =
+               shakeDur.toFixed(3) + "s";
+
+            // shake amplitude via CSS variable
+            const shakeAmp = ((shake / 100) * 2.5).toFixed(2);
+            document.documentElement.style.setProperty(
+               "--shake-amp",
+               shakeAmp + "px",
+            );
+
+            // vignette opacity
+            document.querySelector(".vignette").style.opacity = (
+               vignette / 100
+            ).toFixed(2);
+
+            // chroma opacity
+            document.querySelector(".chroma").style.opacity = (
+               (chroma / 100) *
+               0.25
+            ).toFixed(3);
+
+            // glitch frequency stored for interval
+            window.glitchFreq = (glitch / 100) * 0.25;
+         }
+
+         // ── CAM NAME ──
+         function updateCamName() {
+            const name =
+               document.getElementById("input-camname").value ||
+               "AXON BODY CAM 3";
+            const unit =
+               document.getElementById("input-unit").value || "BRM-07";
+            document.getElementById("cam-info").innerHTML =
+               `${name}<br>1080p · 60FPS · UNIT #${unit}`;
+            document.getElementById("startup-camname").textContent = name;
+         }
+
+         // ── GLITCH ──
+         window.glitchFreq = 0.12;
          setInterval(() => {
-            if (Math.random() < 0.12) {
+            if (Math.random() < window.glitchFreq) {
                const g = document.querySelector(".glitch");
                const frames = 4 + Math.floor(Math.random() * 4);
                let i = 0;
-               const interval = setInterval(() => {
+               const iv = setInterval(() => {
                   g.style.opacity = i % 2 === 0 ? "1" : "0";
                   g.style.transform = `translateX(${(Math.random() - 0.5) * 14}px)`;
                   i++;
                   if (i >= frames) {
-                     clearInterval(interval);
+                     clearInterval(iv);
                      g.style.opacity = "0";
                      g.style.transform = "";
                   }
@@ -603,11 +967,10 @@
             }
          }, 600);
 
-         // hide startup
-         setTimeout(() => {
-            const s = document.querySelector(".startup");
-            if (s) s.style.display = "none";
-         }, 3300);
+         // ── ESC to close settings ──
+         document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && settingsOpen) closeSettings();
+         });
       </script>
    </body>
 </html>

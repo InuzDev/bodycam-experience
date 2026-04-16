@@ -11,6 +11,6 @@ The controls:
 
 ## For developers
 
-This project was made with Electron.js, if you wish to modify it. Please do it with a fork. In a short-term period, I'm planning to develop a rust version to reduce the memory usage in computers. As I wish any device be able to enjoy the experience this "application" provides.
+This project was made with Electron.js, if you wish to modify it. Please do it with a fork.
 
 
